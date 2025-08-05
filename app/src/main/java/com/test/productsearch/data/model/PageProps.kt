@@ -1,0 +1,32 @@
+package com.test.productsearch.data.model
+
+data class PageProps(
+    val adSessionId: String,
+    val bootstrapData: BootstrapData,
+    val canValidateBeaconWithoutFiring: Boolean,
+    val countryRegion: CountryRegion,
+    val dehydratedSearchCv: DehydratedSearchCv,
+    val enableDcaPoc: Boolean,
+    val enableGqlCsrRedirect: Boolean,
+    val enableWcpBeacon: Boolean,
+    val enableWcpBeaconDebug: Boolean,
+    val errorLoggingConfig: ErrorLoggingConfig,
+    val excludeBeacon: Boolean,
+    val headerObj: HeaderObj,
+    val initialData: InitialData,
+    val initialSearchQueryVariables: InitialSearchQueryVariables,
+    val isCaching: Boolean,
+    val isMocksEnabled: Boolean,
+    val isNextPublicMocksEnabled: Boolean,
+    val isomorphicSessionId: String,
+    val nonce: String,
+    val overrideFSConfig: Boolean,
+    val persistedQueriesConfig: PersistedQueriesConfig,
+    val psych: Psych,
+    val queryContextCacheId: Int,
+    val renderViewId: String,
+    val renderViewIdFromHeader: String,
+    val reqHost: String,
+    val ssrTraceparent: String,
+    val trace: Trace
+)
