@@ -115,12 +115,14 @@ class MainActivity : AppCompatActivity() {
                                 it.item
                                     .props.pageProps.initialData.searchResult.itemStacks[0].items.toList()
                             )
-                            if (it.item.props.pageProps.initialData.searchResult.itemStacks[0].count % 40 == 0) {
+                            val itemSize =  it.item
+                                .props.pageProps.initialData.searchResult.itemStacks[0].items.toList().size
+                            if (it.item.props.pageProps.initialData.searchResult.itemStacks[0].count % itemSize == 0) {
                                 pages =
-                                    it.item.props.pageProps.initialData.searchResult.itemStacks[0].count / 40
+                                    it.item.props.pageProps.initialData.searchResult.itemStacks[0].count / itemSize
                             } else {
                                 pages =
-                                    it.item.props.pageProps.initialData.searchResult.itemStacks[0].count / 40 + 1
+                                    it.item.props.pageProps.initialData.searchResult.itemStacks[0].count / itemSize + 1
                             }
                             isLastPage = page >= pages
                         }
