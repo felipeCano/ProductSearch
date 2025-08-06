@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var factory: SearchProcuctViewModelFactory
     lateinit var viewModel: SearchProcuctViewModel
-    private var page = 1
+    private var page = 2
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     //hideProgressBar()
                     response.data?.let {
-                        Log.d("MYTAG", "came here ${it.item.props.pageProps.initialData.searchResult.itemStacks.toList().size}")
+                        Log.d("MYTAG", "came here ${it.item.props.pageProps.initialData.searchResult.itemStacks.get(1).items.toList().size}")
 //                        newsAdapter.differ.submitList(it.articles.toList())
 //                        if (it.totalResults % 20 == 0) {
 //                            pages = it.totalResults / 20

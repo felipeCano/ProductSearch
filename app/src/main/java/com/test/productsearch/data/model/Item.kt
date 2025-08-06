@@ -13,7 +13,5 @@ data class Item(
     val locales: List<String>,
     val page: String,
     val props: Props,
-    val query: Query,
-    val runtimeConfig: RuntimeConfig,
     val scriptLoader: List<Any?>
 )

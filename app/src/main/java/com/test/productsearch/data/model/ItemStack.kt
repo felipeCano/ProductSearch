@@ -6,7 +6,6 @@ data class ItemStack(
     val description: String,
     val items: List<ItemX>,
     val layoutEnum: String,
-    val meta: Meta,
     val queryUsedForSearchResults: String,
     val subTitle: Any,
     val title: String,
