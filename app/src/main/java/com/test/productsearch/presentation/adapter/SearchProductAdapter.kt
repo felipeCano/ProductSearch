@@ -62,7 +62,4 @@ class SearchProductAdapter : RecyclerView.Adapter<SearchProductAdapter.SearchPro
 
     private var onItemClickListener: ((ItemX) -> Unit)? = null
 
-    fun setOnItemClickListener(listener: (ItemX) -> Unit) {
-        onItemClickListener = listener
-    }
 }

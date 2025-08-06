@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var searchProductAdapter: SearchProductAdapter
     lateinit var viewModel: SearchProcuctViewModel
-    private var page = 10
+    private var page = 1
     private var pages = 0
     private var isScrolling = false
     private var isLastPage = false
@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextChange(p0: String?): Boolean {
                 MainScope().launch {
                     delay(2000)
+                    keyword = p0.toString()
                     viewModel.searchProduct(p0.toString(), page)
                     viewSearchedNews()
                 }
@@ -84,7 +85,6 @@ class MainActivity : AppCompatActivity() {
         binding.svSearchProduct.setOnCloseListener(object : SearchView.OnCloseListener {
             override fun onClose(): Boolean {
                 initRecyclerView()
-                //viewNewsList()
                 return false
             }
 
@@ -122,22 +122,27 @@ class MainActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     hideProgressBar()
                     response.data?.let {
-                        Log.d(
-                            "MYTAG",
-                            "came here ${
-                                it.item.props.pageProps.initialData.searchResult.itemStacks[0].items.size
-                            }"
-                        )
-                        searchProductAdapter.differ.submitList(it.item
-                            .props.pageProps.initialData.searchResult.itemStacks[0].items.toList())
-                        if (it.item.props.pageProps.initialData.searchResult.itemStacks[0].count % 40 == 0) {
-                            pages = it.item.props.pageProps.initialData.searchResult.itemStacks[0].count / 20
-                        } else {
-                            pages = it.item.props.pageProps.initialData.searchResult.itemStacks[0].count / 20 + 1
+                        if (it.item.props.pageProps.initialData.searchResult==null) {
+                            searchProductAdapter.differ.submitList(emptyList())
+                            Toast.makeText(this, "Item not found", Toast.LENGTH_LONG)
+                                .show()
+                        }else{
+                            searchProductAdapter.differ.submitList(
+                                it.item
+                                    .props.pageProps.initialData.searchResult.itemStacks[0].items.toList()
+                            )
+                            if (it.item.props.pageProps.initialData.searchResult.itemStacks[0].count % 40 == 0) {
+                                pages =
+                                    it.item.props.pageProps.initialData.searchResult.itemStacks[0].count / 40
+                            } else {
+                                pages =
+                                    it.item.props.pageProps.initialData.searchResult.itemStacks[0].count / 40 + 1
+                            }
+                            isLastPage = page >= pages
                         }
-                        isLoading = page == pages
                     }
                 }
+
                 is Resource.Error -> {
                     hideProgressBar()
                     response.message?.let {
@@ -146,6 +151,7 @@ class MainActivity : AppCompatActivity() {
                             .show()
                     }
                 }
+
                 is Resource.Loading -> {
                     showProgressBar()
                 }
