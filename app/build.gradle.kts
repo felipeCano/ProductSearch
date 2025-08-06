@@ -39,6 +39,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures{
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -71,6 +74,9 @@ dependencies {
     implementation(libs.google.dagger.hilt)
     kapt(libs.google.dagger.hilt.compiler)
     kapt(libs.hilt.compiler)
+    //glide
+    implementation(libs.glide)
+    kapt(libs.compiler)
 }
 
 kapt {

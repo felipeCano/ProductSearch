@@ -1,15 +1,26 @@
 package com.test.productsearch
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.AbsListView
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.test.productsearch.data.util.Resource
+import com.test.productsearch.databinding.ActivityMainBinding
+import com.test.productsearch.presentation.adapter.SearchProductAdapter
 import com.test.productsearch.presentation.viewmodel.SearchProcuctViewModel
 import com.test.productsearch.presentation.viewmodel.SearchProcuctViewModelFactory
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -17,54 +28,138 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var factory: SearchProcuctViewModelFactory
+
+    @Inject
+    lateinit var searchProductAdapter: SearchProductAdapter
     lateinit var viewModel: SearchProcuctViewModel
-    private var page = 2
+    private var page = 10
+    private var pages = 0
+    private var isScrolling = false
+    private var isLastPage = false
+    private var isLoading = false
+    var keyword = ""
+    private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        supportActionBar?.apply {
+            binding.myToolbar.setTitle("Search Product")
+            binding.myToolbar.setTitleTextColor(Color.WHITE)
 
+        }
         viewModel = ViewModelProvider(this, factory)
             .get(SearchProcuctViewModel::class.java)
+        initRecyclerView()
         setSearchView()
     }
 
-    private fun setSearchView(){
-        viewModel.searchProduct("sony",page)
-        viewSearchedNews()
+    private fun initRecyclerView() {
+        binding.rvSearchProduct.apply {
+            adapter = searchProductAdapter
+            layoutManager = LinearLayoutManager(context)
+            addOnScrollListener(this@MainActivity.onScrollListener)
+        }
     }
-    fun viewSearchedNews(){
+
+    private fun setSearchView() {
+        binding.svSearchProduct.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                viewModel.searchProduct(p0.toString(), page)
+                keyword = p0.toString()
+                viewSearchedNews()
+                return false
+            }
+
+            override fun onQueryTextChange(p0: String?): Boolean {
+                MainScope().launch {
+                    delay(2000)
+                    viewModel.searchProduct(p0.toString(), page)
+                    viewSearchedNews()
+                }
+                return false
+            }
+        })
+        binding.svSearchProduct.setOnCloseListener(object : SearchView.OnCloseListener {
+            override fun onClose(): Boolean {
+                initRecyclerView()
+                //viewNewsList()
+                return false
+            }
+
+        })
+    }
+
+    private val onScrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                isScrolling = true
+            }
+        }
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            val layoutManager = binding.rvSearchProduct.layoutManager as LinearLayoutManager
+            val sizeOfTheCurrentList = layoutManager.itemCount
+            val visibleItems = layoutManager.childCount
+            val topPosition = layoutManager.findFirstVisibleItemPosition()
+
+            val hasReachedToEnd = topPosition + visibleItems >= sizeOfTheCurrentList
+            val shoulPaginate = !isLoading && !isLastPage && hasReachedToEnd && isScrolling
+            if (shoulPaginate) {
+                page++
+                viewModel.searchProduct(keyword, page)
+                isScrolling = false
+            }
+        }
+    }
+
+    fun viewSearchedNews() {
         viewModel.searchproduct.observe(this, { response ->
             when (response) {
                 is Resource.Success -> {
-                    //hideProgressBar()
+                    hideProgressBar()
                     response.data?.let {
-                        Log.d("MYTAG", "came here ${it.item.props.pageProps.initialData.searchResult.itemStacks.get(1).items.toList().size}")
-//                        newsAdapter.differ.submitList(it.articles.toList())
-//                        if (it.totalResults % 20 == 0) {
-//                            pages = it.totalResults / 20
-//                        } else {
-//                            pages = it.totalResults / 20 + 1
-//                        }
-//                        isLoading = page == pages
+                        Log.d(
+                            "MYTAG",
+                            "came here ${
+                                it.item.props.pageProps.initialData.searchResult.itemStacks[0].items.size
+                            }"
+                        )
+                        searchProductAdapter.differ.submitList(it.item
+                            .props.pageProps.initialData.searchResult.itemStacks[0].items.toList())
+                        if (it.item.props.pageProps.initialData.searchResult.itemStacks[0].count % 40 == 0) {
+                            pages = it.item.props.pageProps.initialData.searchResult.itemStacks[0].count / 20
+                        } else {
+                            pages = it.item.props.pageProps.initialData.searchResult.itemStacks[0].count / 20 + 1
+                        }
+                        isLoading = page == pages
                     }
                 }
-
                 is Resource.Error -> {
-//                    hideProgressBar()
+                    hideProgressBar()
                     response.message?.let {
                         Log.d("MYTAG", "came here $it")
                         Toast.makeText(this, "An error occurred : $it", Toast.LENGTH_LONG)
                             .show()
                     }
-
-
                 }
-
                 is Resource.Loading -> {
-//                    showProgressBar()
+                    showProgressBar()
                 }
             }
         })
+    }
+
+    private fun showProgressBar() {
+        isLoading = true
+        binding.progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        isLoading = false
+        binding.progressBar.visibility = View.INVISIBLE
     }
 }
