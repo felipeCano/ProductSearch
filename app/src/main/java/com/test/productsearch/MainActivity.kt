@@ -64,31 +64,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setSearchView() {
-        binding.svSearchProduct.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(p0: String?): Boolean {
-                viewModel.searchProduct(p0.toString(), page)
-                keyword = p0.toString()
-                viewSearchedNews()
-                return false
-            }
+        binding.btnAcceptSearch.setOnClickListener {
+            val query =
+                binding.svSearchProduct.query.toString()
 
-            override fun onQueryTextChange(p0: String?): Boolean {
-                MainScope().launch {
-                    delay(2000)
-                    keyword = p0.toString()
-                    viewModel.searchProduct(p0.toString(), page)
-                    viewSearchedNews()
-                }
-                return false
-            }
-        })
-        binding.svSearchProduct.setOnCloseListener(object : SearchView.OnCloseListener {
-            override fun onClose(): Boolean {
-                initRecyclerView()
-                return false
-            }
+            keyword = query
+            viewModel.searchProduct(query, page)
+            viewSearchedNews()
+        }
 
-        })
     }
 
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
@@ -122,11 +106,11 @@ class MainActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     hideProgressBar()
                     response.data?.let {
-                        if (it.item.props.pageProps.initialData.searchResult==null) {
+                        if (it.item.props.pageProps.initialData.searchResult == null) {
                             searchProductAdapter.differ.submitList(emptyList())
                             Toast.makeText(this, "Item not found", Toast.LENGTH_LONG)
                                 .show()
-                        }else{
+                        } else {
                             searchProductAdapter.differ.submitList(
                                 it.item
                                     .props.pageProps.initialData.searchResult.itemStacks[0].items.toList()
