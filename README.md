@@ -1,6 +1,10 @@
+## Descripcion
 La aplicacion realiza una busqueda de productos despues de ingresar cualquier texto y esta realizara la busqueda en el servicio y retorna una lista de productos. 
 
-Se cumplen los siguiente requerimientos:
+## Documentacion Tecnica
+https://deepwiki.com/felipeCano/ProductSearch
+
+## Requerimientos
 
 
 ● Permitirle al usuario buscar productos en base a un texto que sea ingresado. La búsqueda se
