@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    kotlin("kapt")
+    alias(libs.plugins.org.jetbrains.kotlin.kapt)
     alias(libs.plugins.google.dagger.hilt)
 }
 
@@ -67,8 +67,10 @@ dependencies {
     // Annotation processor
     kapt(libs.androidx.lifecycle.compiler)
     //hilt
+    //kapt(libs.androidx.lifecycle.compiler)
     implementation(libs.google.dagger.hilt)
     kapt(libs.google.dagger.hilt.compiler)
+    kapt(libs.hilt.compiler)
 }
 
 kapt {

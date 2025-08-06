@@ -24,7 +24,7 @@ class NetModule {
         val authInterceptor = Interceptor { chain ->
             val originalRequest = chain.request()
             val requestWithApiKey = originalRequest.newBuilder()
-                .header("Apikey", API_KEY)
+                .header("x-rapidapi-key", API_KEY)
                 .build()
             chain.proceed(requestWithApiKey)
         }

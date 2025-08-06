@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface SearchProductAPIService {
 
     @GET("wlm/walmart-search-by-keyword")
-    fun getSearchedSearchProduct(
+    suspend fun getSearchedSearchProduct(
         @Query("keyword")
         searchQuery: String,
         @Query("page")
